@@ -1,0 +1,11 @@
+body{                                                                     
+    margin:0;
+    font-family:san-sarif;
+    font-size: 18px;
+    background-color:#dee6e3;
+}		
+input[type=submit]{
+    background-color:#8082b7;
+}
+
+.userlogin{margin:0 auto;display:block;font-size:30px;font-family:san-serif;font-style:bold;background-color: #8082b7;}

@@ -1,26 +1,28 @@
+
 <cfif structKeyExists(form, "login")>
-    <cfset datasource="dsn_addressbook">
-    <cfquery name="qryUser" datasource="#datasource#">
-        SELECT u.id,u.str_name, u.str_phone, u.str_username,r.str_user_role
+<cfset datasource="dsn_addressbook">
+<cfquery name="qryUser" datasource="#datasource#">
+       SELECT u.id,u.str_name, u.str_phone, u.str_username, r.str_user_role
         FROM tbl_users AS u
         INNER JOIN tbl_user_roles AS r
         ON u.int_user_role_id = r.id
-
         WHERE u.str_username = <cfqueryparam value="#username#" cfsqltype="cf_sql_varchar">
           AND u.str_password = <cfqueryparam value="#password#" cfsqltype="cf_sql_varchar">
-          AND u.cbr_status = 'A'
-          AND r.str_user_role='user'
+          AND cbr_status = 'A'
+          AND r.str_user_role='admin'
     </cfquery>
-   
-    <cfif qryUser.recordCount>
      
-        <cfset session.userid = qryUser.id>
+    <cfif qryUser.recordCount>
+
+        <cfset session.adminid = qryUser.id>
         <cfset session.role = qryUser.str_user_role>
         <cfset session.str_username = qryUser.str_username>
-        <cflocation url="user/fullcontacts.cfm">
+            <cflocation url="admin/admindashboard.cfm">
+        
+
     <cfelse>
         <div class="text-center">
-        <cfoutput><div class="text-danger"> account did not approved</div></cfoutput>
+        <cfoutput><div class="text-danger "> invalid credentials</div></cfoutput>
         </div>
     </cfif>
 </cfif>
@@ -36,15 +38,14 @@
 <body class="loginbody">
 <cfoutput>
     <div>
-    <div> <h1 class="text-center">USERLOGIN</h1></div>
-         <div class=" d-flex justify-content-end">
+        <div> <h1 class="text-center">ADMINLOGIN</h1></div>
+        <div class=" d-flex justify-content-end">
             <button type="button" class="btn btn-success me-2" onclick="slideAndRedirect()">USER</button>
            <button type="button" class="btn btn-info" onclick="window.location.href='loginasadmin.cfm'" >ADMIN</button>
         </div>
         
-       
-  
-        <form action="" method="post">
+    
+        <form action="loginasadmin.cfm" method="post">
             <div class="container">
                 <div class="logintble col-lg-4 mx-auto"  >
                     <div class="mb-3">
@@ -58,16 +59,13 @@
                     <div class="mb-3 col-auto">
                         <input type="submit" value="LOGIN" id="submit" class="userlogin" name="login">
                     </div>
-                    <div class=" d-flex justify-content-between">
-                        <a href="" class="text-start text-decoration-none" >forgot password</a>
-                        <a href="register.cfm"  class="text-end text-decoration-none">Sign Up</a>
-                    </div>
+                    
                 </div>
             </div>
         </form>
        
     </div>
-    <script src="file.js"></script>
+   <script src="js/file.js"></script>
 </body>
 </html>
 </cfoutput>

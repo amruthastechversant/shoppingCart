@@ -1,0 +1,19 @@
+control block
+-------------
+get 
+---
+getContactList()
+getEducationOptions()
+getLocationOptions()
+
+
+Display
+-------
+Filter
+--
+Gender
+Keyword (firstname, lastname, address)
+Location
+education
+--
+

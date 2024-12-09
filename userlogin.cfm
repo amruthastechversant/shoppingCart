@@ -1,30 +1,4 @@
-<cfif structKeyExists(form, "login")>
-    <cfset datasource="dsn_addressbook">
-    <cfquery name="qryUser" datasource="#datasource#">
-        SELECT u.id,u.str_name, u.str_phone, u.str_username,r.str_user_role
-        FROM tbl_users AS u
-        INNER JOIN tbl_user_roles AS r
-        ON u.int_user_role_id = r.id
-
-        WHERE u.str_username = <cfqueryparam value="#username#" cfsqltype="cf_sql_varchar">
-          AND u.str_password = <cfqueryparam value="#password#" cfsqltype="cf_sql_varchar">
-          AND u.cbr_status = 'A'
-          AND r.str_user_role='user'
-    </cfquery>
-   
-    <cfif qryUser.recordCount>
-     
-        <cfset session.userid = qryUser.id>
-        <cfset session.role = qryUser.str_user_role>
-        <cfset session.str_username = qryUser.str_username>
-        <cflocation url="user/fullcontacts.cfm">
-    <cfelse>
-        <div class="text-center">
-        <cfoutput><div class="text-danger"> account did not approved</div></cfoutput>
-        </div>
-    </cfif>
-</cfif>
-
+<cfinclude template="userloginaction.cfm">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,8 +18,13 @@
         
        
   
-        <form action="" method="post">
+        <form action="userlogin.cfm" method="post">
             <div class="container">
+            <cfif len(session.error_msg) GT 0>
+                        <div class="text-danger text-center">
+                         <cfoutput>#session.error_msg#</cfoutput>
+                         </div>
+                    </cfif>
                 <div class="logintble col-lg-4 mx-auto"  >
                     <div class="mb-3">
                         <label for="username">USERNAME</label>

@@ -14,12 +14,8 @@
 <cfset selectedPermissions = []>
 
 <!-- Convert selected permissions to an array -->
-<cfif structKeyExists(form, "int_permission_id_list") AND len(form.int_permission_id_list) GT 0>
-    <cfif isArray(form.int_permission_id_list)>
-        <cfset selectedPermissions = form.int_permission_id_list>
-    <cfelse>
-        <cfset selectedPermissions = listToArray(form.int_permission_id_list, ",")>
-    </cfif>
+<cfif len(form.int_permission_id_list) GT 0>
+    <cfset selectedPermissions = isArray(form.int_permission_id_list) ? form.int_permission_id_list : listToArray(form.int_permission_id_list, ",")>
 </cfif>
 
 <!-- Check if permissions are valid -->

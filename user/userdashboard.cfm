@@ -6,25 +6,25 @@
 
 <!-- Display user contacts -->
 <cfquery name="qryContacts" datasource="dsn_addressbook">
-    SELECT * 
+    SELECT *
     FROM contacts 
-    WHERE userid = <cfqueryparam value="#session.userid#" cfsqltype="cf_sql_integer">
+    WHERE userid = <cfqueryparam value="#session.user_id#" cfsqltype="cf_sql_integer">
 </cfquery>
 
 <cfoutput>
     <table border="1">
-        <tr><th>strFirstname</th><th>strLastname</th><th>strEducation</th><th>strProfile</th><th>intAge</th><th>strGender</th><th>intphoneNo</th><th>strHobbies</th><th>strAddress</th></tr>
+        <tr><th>str_Firstname</th><th>str_Lastname</th><th>int_education_id</th><th>str_Profile</th><th>int_Age</th><th>str_Gender</th><th>int_phoneNo</th><th>str_Hobbies</th><th>str_Address</th></tr>
         <cfloop query="qryContacts">
             <tr>
-                <td>#strFirstname#</td>
-                <td>#strLastname#</td>
-                <td>#strEducation#</td>
-                <td>#strProfile#</td>
-                <td>#intAge#</td>
-                <td>#strGender#</td>
-                <td>#intphoneNo#</td>
-                <td>#strHobbies#</td>
-                <td>#strAddress#</td>
+                <td>#str_Firstname#</td>
+                <td>#str_Lastname#</td>
+                <td>#int_education_id#</td>
+                <td>#str_Profile#</td>
+                <td>#int_Age#</td>
+                <td>#str_Gender#</td>
+                <td>#int_phoneNo#</td>
+                <td>#str_Hobbies#</td>
+                <td>#str_Address#</td>
             </tr>
         </cfloop>
     </table>

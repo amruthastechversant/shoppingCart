@@ -1,69 +1,7 @@
-
-<cfif  NOT structKeyExists(session, "userid") OR  session.userid EQ "" OR session.userid IS 0>
-    <cflocation url="../userlogin.cfm" addtoken="false" >
+<cfinclude  template="fullcontactsaction.cfm">
+<cfif NOT structKeyExists(session, "user_id") OR session.user_id EQ "" OR session.user_id IS 0>
+    <cflocation url="../userlogin.cfm" addtoken="false">
 </cfif>
-
-
-
-<cfset datasource="dsn_addressbook">
-<cfparam name="form.currentPage" default="1">
-<cfparam name="form.recordsPerPage" default="10">
-<cfif structKeyExists(URL, "currentPage")>
-    <cfset currentPage = val(URL.currentPage)>
-<cfelseif structKeyExists(form, "currentPage")>
-    <cfset currentPage = val(form.currentPage)>
-<cfelse>
-    <cfset currentPage = 1>
-</cfif>
-<cfset recordsPerPage = val(form.recordsPerPage)>
-<cfset startRecord = (currentPage - 1) * recordsPerPage>
-
-
-
-
-<cfquery name="qryTotalContacts" datasource="#datasource#">
-    select COUNT(*) as totalCount
-    from contacts
-</cfquery>
-
-<cfset totalcontacts=qryTotalContacts.totalCount>
-<cfset totalpages=ceiling(totalcontacts/recordsPerPage)>
-
-
-<cffunction name="getContacts" returnType="query">
-    <cfset var qryResults = "">
-    <cfset var datasource = "dsn_addressbook">
-    <cfquery name="qryResults" datasource="#datasource#">
-        SELECT *
-        FROM contacts
-       ORDER BY intContactId
-        LIMIT <cfqueryparam value="#startRecord#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#recordsPerPage#" cfsqltype="cf_sql_integer">
-    </cfquery>
-    <cfreturn qryResults>
-</cffunction>
-
-
-<!---pagination--->
-<cfset contactData = getContacts()>
-
-
-
-
-
-
-<!-- Query user permissions during login -->
-<cfquery name="qryUserPermissions" datasource="dsn_addressbook">
-    SELECT int_permission_id
-    FROM tbl_user_permissions
-    WHERE int_user_id = <cfqueryparam value="#session.userid#" cfsqltype="cf_sql_integer">
-</cfquery>
-
-<!-- Store permissions in SESSION -->
-<cfset SESSION.permissions = ArrayNew(1)>
-<cfloop query="qryUserPermissions">
-    <cfset ArrayAppend(SESSION.permissions, qryUserPermissions.int_permission_id)>
-</cfloop>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,89 +12,104 @@
     <link rel="stylesheet" href="../css/file.css">
 </head>
 <body>
-<div class="header">
-    <img src="../img/logo.png" alt="logo" class="logo">
-    <a href="fullcontacts.cfm">Home</a>
-    <a href="fullcontacts.cfm">Contacts</a>
-    <a href="index.cfm">Create Contact</a>
-    <a href="../userlogin.cfm" class="moveright">Log out</a>
-</div>
-<h1 align="center">CONTACT LIST</h1>
-<table class="table table-bordered" align="center" style="border-color:#82a5c7;">
-    <thead>
-        <tr>
-            <th>Firstname</th>
-            <th>Lastname</th>
-            <th>Details</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <cfoutput query="contactData">
+    <!-- Header with navigation links -->
+    <div class="header">
+        <img src="../img/logo.png" alt="logo" class="logo">
+        <a href="../admin/homepage.cfm">Home</a>
+        <a href="approvedUserProfile.cfm">Profile</a>
+        <a href="addContact.cfm">Create Contact</a>
+        <a href="../userlogin.cfm" class="moveright">Log out</a>
+    </div>
+
+    <!-- Display welcome message for the logged-in user -->
+    <cfoutput>
+        <h2 class="text-left text-primary">Welcome #session.str_username#</h2>
+    </cfoutput>
+
+    <!-- Main title for the page -->
+    <h1 align="center">CONTACT LIST</h1>
+    <table class="table table-bordered table-sm table-responsive" align="center" style="border-color:#82a5c7;" >
+        <thead>
             <tr>
-                <td>#strFirstName#</td>
-                <td>#strLastName#</td>
-                <td>
-                    <!-- Link to the details page with the contactId -->
-                   
-
-                    <cfif ArrayContains(SESSION.permissions, 1)>
-                        <a href="userdetails.cfm?contactId=#intContactId#" class="text-decoration-none">
-                            view Details
-                        </a>
-                    </cfif>
-                </td>
-                <td>
-                    <!-- Conditionally display Edit and Delete buttons -->
-                    
-                    <!-- Edit Button (Permission ID: 2) -->
-                    <cfif ArrayContains(SESSION.permissions, 2)>
-                        <a href="editcontact.cfm?contactId=#intContactId#" class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
-                    </cfif>
-                    
-                    <!-- Delete Button (Permission ID: 3) -->
-                    <cfif ArrayContains(SESSION.permissions, 3)>
-                        <a href="deletecontact.cfm?contactId=#intContactId#" 
-                           class="btn btn-danger btn-sm" 
-                           onclick="return confirm('Are you sure you want to delete this contact?');">
-                            Delete
-                        </a>
-                    </cfif>
-
-                   
-                </td>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Education</th>
+                <th>phoneno</th>
+                <th>Actions</th>
             </tr>
-        </cfoutput>
-    </tbody>
-</table>
-<cfoutput>
-<nav aria-label="Page navigation">
-    <ul class="pagination">
-        <!-- Previous Button -->
-        <cfif currentPage GT 1>
-            <li class="page-item">
-                <a class="page-link" href="fullcontacts.cfm?currentPage=#currentPage - 1#" aria-label="Previous">Previous</a>
-            </li>
-        </cfif>
+        </thead>
+        <tbody>
+            <!-- Loop through the contact data and display each contact -->
+            <cfoutput query="contactData">
+                <tr>
+                    <td>#str_firstname#</td>
+                    <td>#str_lastname#</td>
+                    <td>#title#</td>
+                    <td>#int_phone_no#</td>
+                    <td>
+                        <!-- Conditionally display Edit and Delete buttons based on permissions -->
+                     
+                        <!-- Link to the contact details page with the contactId -->
+                        <cfif ArrayContains(SESSION.permissions, 1)>
+                            <a href="userdetails.cfm?contactId=#int_contact_id#" class="btn btn-primary btn-sm">
+                                View 
+                            </a>
+                        </cfif>
+                
+                        <!-- Edit Button (Permission ID: 2) -->
+                        <cfif ArrayContains(SESSION.permissions, 2)>
+                            <a href="addContact.cfm?contactId=#int_contact_id#" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+                        </cfif>
+                        
+                        <!-- Delete Button (Permission ID: 3) -->
+                        <cfif ArrayContains(SESSION.permissions, 3)>
+                            <a href="deletecontact.cfm?contactId=#int_contact_id#" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Are you sure you want to delete this contact?');">
+                                Delete
+                            </a>
+                            
+                        </cfif>
+                    </td>
+                </tr>
+            </cfoutput>
+        </tbody>
+    </table>
 
-        <!-- Page Numbers -->
-        <cfloop index="i" from="1" to="#totalPages#">
-            <li class="page-item <cfif i EQ currentPage>active</cfif>">
-                <a class="page-link" href="fullcontacts.cfm?currentPage=#i#">#i#</a>
-            </li>
-        </cfloop>
+    <!-- Pagination controls -->
+    <cfoutput>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <!-- Previous Button -->
+                <cfif currentPage GT 1>
+                    <li class="page-item">
+                        <a class="page-link" href="fullcontacts.cfm?currentPage=#currentPage - 1#" aria-label="Previous">Previous</a>
+                    </li>
+                </cfif>
 
-        <!-- Next Button -->
-        <cfif currentPage LT totalPages>
-            <li class="page-item">
-                <a class="page-link" href="fullcontacts.cfm?currentPage=#currentPage + 1#" aria-label="Next">Next</a>
-            </li>
-        </cfif>
-    </ul>
-</nav>
+                <!-- Page Numbers -->
+                <cfloop index="i" from="1" to="#totalPages#">
+                    <li class="page-item <cfif i EQ currentPage>active</cfif>">
+                        <a class="page-link" href="fullcontacts.cfm?currentPage=#i#">#i#</a>
+                    </li>
+                </cfloop>
 
-</cfoutput>
+                <!-- Next Button -->
+                <cfif currentPage LT totalPages>
+                    <li class="page-item">
+                        <a class="page-link" href="fullcontacts.cfm?currentPage=#currentPage + 1#" aria-label="Next">Next</a>
+                    </li>
+                </cfif>
+            </ul>
+        </nav>
+
+    <div class="footer">
+        <a class="p-0 px-md-3 px-1" href="https://www.amazon.in/gp/help/customer/display.html?nodeId=200507590&ref_=footer_gw_m_b_he">Copyright Info</a>
+        <a class="p-0 px-md-3 px-1" href="https://www.facebook.com/login.php">References</a>
+        <a class="p-0 px-md-3 px-1" href="">Contact</a>
+    </div>
 </body>
 </html>
+</cfoutput>

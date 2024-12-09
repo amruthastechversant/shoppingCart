@@ -1,30 +1,45 @@
+<!---setDefaultValues()
+getFormValues()
+validateFormValues()
+saveContacts()--->
 
-<cfif structKeyExists(form, "login")>
-<cfset datasource="dsn_addressbook">
-<cfquery name="qryUser" datasource="#datasource#">
-       SELECT u.id,u.str_name, u.str_phone, u.str_username, r.str_user_role
-        FROM tbl_users AS u
-        INNER JOIN tbl_user_roles AS r
-        ON u.int_user_role_id = r.id
-        WHERE u.str_username = <cfqueryparam value="#username#" cfsqltype="cf_sql_varchar">
-          AND u.str_password = <cfqueryparam value="#password#" cfsqltype="cf_sql_varchar">
-          AND cbr_status = 'A'
-          AND r.str_user_role='admin'
-    </cfquery>
+<cffunction  name="setDefaultValues" access="public" returnType="void">
+<cfset session.error_msg="">
+</cffunction>
+
+
+<cffunction  name="getFormValues" access="public" returnType="void">
+    <cfargument  name="username" type="string" required="true">
+    <cfargument  name="password" type="string" required="true">
+    <cfif structKeyExists(form, "login")>
+        <cfset datasource="dsn_addressbook">
+        <cfquery name="qryUser" datasource="#datasource#">
+            SELECT u.id,u.str_name, u.str_phone, u.str_username, r.str_user_role
+            FROM tbl_users AS u
+            INNER JOIN tbl_user_roles AS r
+             ON u.int_user_role_id = r.id
+            WHERE u.str_username = <cfqueryparam value="#username#" cfsqltype="cf_sql_varchar">
+            AND u.str_password = <cfqueryparam value="#password#" cfsqltype="cf_sql_varchar">
+            AND cbr_status = 'A'
+            AND r.str_user_role='admin'
+        </cfquery>
      
     <cfif qryUser.recordCount>
 
         <cfset session.adminid = qryUser.id>
         <cfset session.role = qryUser.str_user_role>
         <cfset session.str_username = qryUser.str_username>
-            <cflocation url="admin/admindashboard.cfm">
+        <cflocation url="admin/admindashboard.cfm">
         
-
     <cfelse>
-        <div class="text-center">
-        <cfoutput><div class="text-danger "> invalid credentials</div></cfoutput>
-        </div>
+        <cfset session.error_msg="invalid credentials">
     </cfif>
+</cfif>
+</cffunction>
+
+<cfset setDefaultValues()>
+<cfif structKeyExists(form, "login")>
+    <cfset getFormValues(username=form.username,password=form.password)>
 </cfif>
 
 <!DOCTYPE html>
@@ -44,7 +59,7 @@
            <button type="button" class="btn btn-info" onclick="window.location.href='loginasadmin.cfm'" >ADMIN</button>
         </div>
         
-    
+     <div class="errordiv text-danger text-center"> #session.error_msg#</div>
         <form action="loginasadmin.cfm" method="post">
             <div class="container">
                 <div class="logintble col-lg-4 mx-auto"  >
@@ -63,7 +78,6 @@
                 </div>
             </div>
         </form>
-       
     </div>
    <script src="js/file.js"></script>
 </body>

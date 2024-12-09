@@ -12,20 +12,25 @@
 <body>
 <div class="header">
     <img src="../img/logo.png" alt="logo" class="logo">
-    <a href="homepage.html">Home</a>
-    <a href="contactList.cfm">Contacts</a>
+    <a href="fullcontacts.cfm">Home</a>
+    <a href="">Contacts</a>
     <a href="index.cfm">Create Contact</a>
     <a href="../userlogin.cfm" class="moveright">Log out</a>
 </div>
 
-
-
 <cfparam name="url.contactId" default="0">
 <cfquery name="contactDetails" datasource="dsn_addressbook">
-    SELECT strFirstName, strLastName, strEducation, intAge, strProfile, 
-           strAddress, intphoneNo, strGender, strHobbies
+    SELECT str_firstname, str_lastname, int_education_id, str_profile, int_age, str_gender, int_phone_no, str_hobbies, str_address, int_contact_id
     FROM contacts
-    WHERE intContactId = <cfqueryparam value="#url.contactId#" cfsqltype="cf_sql_integer">
+    WHERE int_contact_id = <cfqueryparam value="#url.contactId#" cfsqltype="cf_sql_integer">
+</cfquery>
+
+<cfquery name="getEducation" datasource="dsn_addressbook">
+    SELECT education.title
+    FROM contacts
+    JOIN education
+    ON contacts.int_education_id = education.id
+    WHERE contacts.int_contact_id = <cfqueryparam value="#url.contactId#" cfsqltype="cf_sql_integer">
 </cfquery>
 
 
@@ -35,39 +40,39 @@
         <tbody>
             <tr>
                 <td><strong>Firstname:</strong></td>
-                <td>#contactDetails.strFirstName#</td>
+                <td>#contactDetails.str_firstname#</td>
             </tr>
             <tr>
                 <td><strong>Lastname:</strong></td>
-                <td>#contactDetails.strLastName#</td>
+                <td>#contactDetails.str_lastname#</td>
             </tr>
             <tr>
                 <td><strong>Education:</strong></td>
-                <td>#contactDetails.strEducation#</td>
+                <td>#getEducation.title#</td>
             </tr>
             <tr>
                 <td><strong>Age:</strong></td>
-                <td>#contactDetails.intAge#</td>
+                <td>#contactDetails.int_age#</td>
             </tr>
             <tr>
                 <td><strong>Profile:</strong></td>
-                <td>#contactDetails.strProfile#</td>
+                <td>#contactDetails.str_profile#</td>
             </tr>
             <tr>
                 <td><strong>Address:</strong></td>
-                <td>#contactDetails.strAddress#</td>
+                <td>#contactDetails.str_address#</td>
             </tr>
             <tr>
                 <td><strong>Phone Number:</strong></td>
-                <td>#contactDetails.intphoneNo#</td>
+                <td>#contactDetails.int_phone_no#</td>
             </tr>
             <tr>
                 <td><strong>Gender:</strong></td>
-                <td>#contactDetails.strGender#</td>
+                <td>#contactDetails.str_gender#</td>
             </tr>
             <tr>
                 <td><strong>Hobbies:</strong></td>
-                <td>#contactDetails.strHobbies#</td>
+                <td>#contactDetails.str_hobbies#</td>
             </tr>
         </tbody>
     </table>

@@ -17,13 +17,13 @@ input[type=submit]{
 .loginbody{
     background-color:#dee6e3;margin:0; padding:50px;
 }
-.logintble{background-color:#c2e5d8;height:375px; border:0; padding:30px 20px;     margin: 40px;background-image: url('img/3525926.jpg');}
-.logintblreg{background-color:#c2e5d8;height:500px; border:0; padding:30px 20px;     margin: 40px;background-image: url('img/3525926.jpg');}
+.logintble{background-color:#c2e5d8;height:375px; border:0; padding:30px 20px;margin: 40px;background-image: url('img/3525926.jpg');}
+.logintblreg{background-color:#c2e5d8;height:500px; border:0; padding:30px 20px;   margin: 40px;background-image: url('img/3525926.jpg');}
 .header{
     width:100%;
     text-align:center;
     padding:10px;
-    background-color:#8082b7;
+    background-color:#9899c1;
     display:flex;
 }
 .sidebar{
@@ -133,3 +133,4 @@ label span{
 .signindiv{
     margin:0 auto;display:block;font-size:30px;font-family:san-serif;font-style:bold;background-color: #8082b7;
 }
+.detail-box{background: linear-gradient(to right, #8291cf, #f1f2f3);border-radius:15px;}

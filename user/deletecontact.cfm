@@ -1,7 +1,5 @@
-<cfif NOT structKeyExists(session, "userid") OR session.userid EQ "" OR session.userid IS 0>
-    <cflocation url="../userlogin.cfm" addtoken="false">
-</cfif>
 
+<cffunction  name="deleteContact" access="public" returnType="void">
 <!-- Check if the user has delete permission (Permission ID 3) -->
 <cfif NOT ArrayContains(SESSION.permissions, 3)>
     <cfset errorMessage = "You do not have permission to delete contacts.">
@@ -22,11 +20,12 @@
 <!-- Perform the deletion -->
 <cfquery name="deleteContact" datasource="dsn_addressbook">
     DELETE FROM contacts
-    WHERE intContactId = <cfqueryparam value="#contactId#" cfsqltype="cf_sql_integer">
+    WHERE int_contact_id = <cfqueryparam value="#contactId#" cfsqltype="cf_sql_integer">
 </cfquery>
 
 <cfset successMessage = "Contact deleted successfully.">
 <cfoutput>#successMessage#</cfoutput>
-
 <!-- Redirect back to the contact list page -->
 <cflocation url="fullcontacts.cfm" addtoken="false">
+</cffunction>
+<cfset deleteContact()>

@@ -11,12 +11,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add contact Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/file.css">
+    <link rel="stylesheet" href="../taskmanagement/css/addtaskstyles.css">
 </head>
 <body>
         <div class="header">
             <img src="../img/logo.png" alt="logo" class="logo">
-            <a href="">Home</a>
+            <a href="../admin/homepage.cfm">Home</a>
             <a href="fullcontacts.cfm">Contacts</a>
             <a href="addContact.cfm">Create Contact</a>
             <a href="userlogout.cfm" class="moveright">Log out</a>

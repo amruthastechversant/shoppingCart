@@ -24,7 +24,7 @@ saveContacts()
 
 </cffunction>
 <cffunction  name="getQualification" access="public" returnType="void">
-    <cfquery name= variables.qryGetEducationOptions datasource="#variables.datasource#">
+    <cfquery name="variables.qryGetEducationOptions" datasource="#variables.datasource#">
         select ID,TITLE as education from education
    </cfquery>
 </cffunction>

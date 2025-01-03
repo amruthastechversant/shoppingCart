@@ -1,18 +1,9 @@
-body{ 
-    margin-left: 10px;
-    font-family:san-sarif;
-    font-size: 18px;
-    background-color:#dee6e3; 
-                                                                   
-    margin:0;
-    font-family:san-sarif;
-    font-size: 18px;
-    background-image:url("pexels-veeterzy-303383.jpg");
-}		
+
+
 input[type=submit]{
     background-color:#8082b7;
 }
-
+.indextable{background-color:#dee6e3; color:black;border:"1";}
 .userlogin{margin:0 auto;display:block;font-size:20px;font-family:san-serif;font-style:bold;background-color: #8082b7;}
 .loginbody{
     background-color:#dee6e3;margin:0; padding:50px;
@@ -24,6 +15,7 @@ input[type=submit]{
     text-align:center;
     padding:10px;
     background-color:#9899c1;
+    font-family:san-sarif;
     display:flex;
 }
 .sidebar{
@@ -54,7 +46,7 @@ input[type=submit]{
     .sidebar {padding-top: 15px;}
     .sidebar a {font-size: 18px;}
   }
-
+  .todaystasktable{ font-family:san-sarif;}
 
 
 

@@ -20,12 +20,12 @@
               AND u.cbr_status = 'A'
               AND r.str_user_role = 'user'
         </cfquery>
-    
+
         <cfif qryUser.recordCount>
             <cfset session.user_id = qryUser.id>
             <cfset session.role = qryUser.str_user_role>
             <cfset session.str_username = qryUser.str_username>
-            <cflocation url="admin/homepage.cfm">
+            <cflocation url="addtask.cfm">
         <cfelse>
             <cfset session.error_msg = "Invalid username and password">
         </cfif>

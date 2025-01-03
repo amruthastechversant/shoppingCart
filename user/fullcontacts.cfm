@@ -2,6 +2,8 @@
 <cfif NOT structKeyExists(session, "user_id") OR session.user_id EQ "" OR session.user_id IS 0>
     <cflocation url="../userlogin.cfm" addtoken="false">
 </cfif>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +11,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/file.css">
+    <link rel="stylesheet" href="../taskmanagement/css/addtaskstyles.css">
 </head>
 <body>
     <!-- Header with navigation links -->
     <div class="header">
         <img src="../img/logo.png" alt="logo" class="logo">
         <a href="../admin/homepage.cfm">Home</a>
-        <a href="approvedUserProfile.cfm">Profile</a>
+       <!--- <a href="approvedUserProfile.cfm">Profile</a>--->
+        <a href="../taskmanagement/addtask.cfm">Tasks</a>
         <a href="addContact.cfm">Create Contact</a>
+        
         <a href="../userlogin.cfm" class="moveright">Log out</a>
     </div>
 
@@ -48,7 +52,7 @@
                     <td>#int_phone_no#</td>
                     <td>
                         <!-- Conditionally display Edit and Delete buttons based on permissions -->
-                     
+                   
                         <!-- Link to the contact details page with the contactId -->
                         <cfif ArrayContains(SESSION.permissions, 1)>
                             <a href="userdetails.cfm?contactId=#int_contact_id#" class="btn btn-primary btn-sm">
@@ -79,7 +83,7 @@
     </table>
 
     <!-- Pagination controls -->
-    <cfoutput>
+    <cfoutput> 
         <nav aria-label="Page navigation">
             <ul class="pagination">
                 <!-- Previous Button -->

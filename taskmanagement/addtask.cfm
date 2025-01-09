@@ -122,6 +122,8 @@
     <label for="recurrence_end_date" class="mt-3">Recurrence End Date:</label>
     <input type="date" name="recurrence_end_date" id="recurrence_end_date" class="form-control" 
            value="#variables.recurrence_end_date#">
+    <label for="estimate_hours" class="mt-3">Estimate Hours:</label>
+        <input type="number" name="estimate_hours" id="estimate_hours" class="form-control" value="#variables.estimate_hours#" step="0.01" min="0">
             <button type="submit" value="submit" name="saveTask" class="btn btn-primary mt-3">Add Task</button>
         </form>
        

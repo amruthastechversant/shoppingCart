@@ -27,6 +27,7 @@
              c.is_recurring, 
         c.recurrence_type, 
         c.recurrence_end_date,
+        c.estimate_hours,
             e.priority
         FROM 
             tasks AS c 
@@ -70,6 +71,7 @@
              c.is_recurring, 
         c.recurrence_type, 
         c.recurrence_end_date,
+        c.estimate_hours,
             e.priority
         FROM 
             tasks AS c 

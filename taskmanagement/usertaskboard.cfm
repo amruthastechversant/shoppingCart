@@ -55,6 +55,7 @@
 
     <p class="card-text"><strong>Recurrence Type:</strong> #recurrence_type#</p>
     <p class="card-text"><strong>Recurrence End Date:</strong> #DateFormat(recurrence_end_date, "mm/dd/yyyy")#</p>
+    <p class="card-text"><strong>Estimate hours:</strong>#estimate_hours#</p>
     <a href="addtask.cfm?userId=#tasks.int_task_id#" class="btn btn-warning btn-sm">Edit</a>
     <a href="deletecontact.cfm?userId=#tasks.int_task_id#" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this contact?');">Delete</a>      
 </div>

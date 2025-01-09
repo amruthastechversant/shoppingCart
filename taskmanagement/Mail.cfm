@@ -1,7 +1,8 @@
 
 
 <cfinclude  template="taskboardaction.cfm">
-
+<cfset success_msg="">
+<cfset error_msg="">
 <cfset TodaysTasks=getTodayTask()>
 <cffunction  name="sendmail" access="public" returnType="void">
     <cfargument  name="email" type="string" required="true">
@@ -25,48 +26,29 @@
        </cfoutput>
     </cfmail>
 
-
+<cfset success_msg="sent successfully">
 <cfcatch type="any">
-        error found:sending mail
-    
+       <cfset error_msg = "error found: sending mail " & cfcatch.message>
 </cfcatch>
 </cftry>
 </cffunction>
-
 
     <cfquery name="usertasks" datasource="dsn_addressbook">
         select u.str_username,u.email,t.int_user_id,t.str_task_name,t.str_task_description,t.dt_task_due_date
         from tbl_users as u
         join tasks as t on u.id= t.int_user_id where
-         CAST(t.dt_task_due_date AS DATE) = <cfqueryparam value="#dateAdd("d", 1, Now())#" cfsqltype="cf_sql_date">
+         t.dt_task_due_date  = <cfqueryparam value="#dateAdd("d", 1, Now())#" cfsqltype="cf_sql_date">
          AND t.GetEmailSent=0
          ORDER BY u.str_username,t.dt_task_due_date
     </cfquery>
+
  <cfif usertasks.recordCount GT 0>
-    <cfdump  var="#usertasks.recordCount#" abort>
+        
     <cfset currentUserID = 0>
     
-    <cfset taskDetails = "">
-    <cfset isDateDisplayed = false>
-
     <cfloop query="usertasks">
-      
-        <cfif usertasks.int_user_id NEQ currentUserID AND currentUserID NEQ 0>
-            <cfset sendmail(
-                email=usertasks.email, 
-                str_username=usertasks.str_username, 
-                taskDetails=taskDetails
-            )>
-
-            <cfquery datasource="dsn_addressbook">
-                update tasks
-                set GetEmailSent=1
-                where int_user_id=<cfqueryparam value="#currentUserID#" cfsqltype="cf_sql_integer">
-                AND GetEmailSent=0
-            </cfquery>
             <cfset taskDetails = ""> 
             <cfset isDateDisplayed = false> 
-        </cfif>
 
        
         <cfif NOT isDateDisplayed>
@@ -77,25 +59,29 @@
         <cfset taskDetails &= "Task Name: #usertasks.str_task_name#<br>
                                Task Description: #usertasks.str_task_description#<br><br>">
         <cfset currentUserID = usertasks.int_user_id>
-    </cfloop>
+        <cfif usertasks.int_user_id NEQ 0>
+            <cfset sendmail(
+                email=usertasks.email, 
+                str_username=usertasks.str_username, 
+                taskDetails=taskDetails
+            )>
 
-  
-    <cfif taskDetails NEQ "">
-        <cfset sendmail(
-            email=usertasks.email, 
-            str_username=usertasks.str_username, 
-            taskDetails=taskDetails
-        )>
-
-        <cfquery datasource="dsn_addressbook">
-            update tasks
-            set GetEmailSent=1
-            where  int_user_id=<cfqueryparam value="#currentUserID#" cfsqltype="cf_sql_integer">
+           <cfquery datasource="dsn_addressbook">
+                update tasks
+                set GetEmailSent=1
+                where int_user_id=<cfqueryparam value="#currentUserID#" cfsqltype="cf_sql_integer">
                 AND GetEmailSent=0
-        </cfquery>
-    </cfif>
-
-    
+            </cfquery>
+        </cfif>
+    </cfloop>
+    <cfif len(error_msg)>
+        <cfoutput>#error_msg#
+        </cfoutput>
+        <cfelse>
+            <cfoutput>
+                #success_msg#
+            </cfoutput>
+        </cfif>
 <cfelse>
     <p>No tasks for today</p>
 </cfif>

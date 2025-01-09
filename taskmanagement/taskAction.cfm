@@ -17,6 +17,7 @@
     <cfset variables.is_recurring="">
     <cfset variables.recurrence_type="">
     <cfset variables.recurrence_end_date="">
+    <cfset variables.estimate_hours="">
     <cfset variables.datasource="dsn_addressbook">
     
     <cfset getpriority()>
@@ -40,7 +41,7 @@
         <cfset userId = url.userId>
         <cfset datasource = "dsn_addressbook">
         <cfquery name="contactDetails" datasource="#datasource#">
-            SELECT int_task_id,int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,created_at,is_recurring,recurrence_type,recurrence_end_date
+            SELECT int_task_id,int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,created_at,is_recurring,recurrence_type,recurrence_end_date,estimate_hours
             FROM tasks
             WHERE int_task_id = <cfqueryparam value="#userId#" cfsqltype="cf_sql_integer">
         </cfquery>
@@ -69,6 +70,7 @@
             <cfset variables.is_recurring = contactDetails.is_recurring> 
             <cfset  variables.recurrence_type=contactDetails.recurrence_type>
             <cfset variables.recurrence_end_date=contactDetails.recurrence_end_date>
+            <cfset variables.estimate_hours=contactDetails.estimate_hours>
         </cfif>
        
        
@@ -112,7 +114,11 @@
             <cfset variables.recurrence_end_date="">
         </cfif>
 
-        
+        <cfif structKeyExists(form, "estimate_hours")AND ISNUMERIC(form.estimate_hours)>
+            <cfset variables.estimate_hours=javacast("int", form.estimate_hours)>
+        <cfelse>
+            <cfset variables.estimate_hours=0>
+        </cfif>
 </cffunction>
 
 
@@ -122,9 +128,9 @@
     <cfargument name="priority" type="string">
     <cfargument  name="status" type="string">
     <cfargument name="duedate" type="string">
-
     <cfargument name="recurrence_type" type="string">
     <cfargument  name="recurrence_end_date" type="string">
+    <cfargument name="estimate_hours" type="float">
     
 
     <cfset var error_msg = ''>
@@ -150,11 +156,9 @@
         <cfset error_msg &= "Select a valid due date.<br>">
     </cfif>
 
-
-
-    
-    
-
+    <cfif NOT isNumeric(arguments.estimate_hours)  OR arguments.estimate_hours LT 0>
+        <cfset error_msg &="enter valid non negetive number for estimate hours.<br>">
+    </cfif>
 
     <cfreturn error_msg>
 </cffunction>
@@ -170,6 +174,7 @@
     <cfargument  name="is_recurring" type="boolean">
     <cfargument name="recurrence_type" type="string">
     <cfargument  name="recurrence_end_date" type="string">
+    <cfargument  name="estimate_hours" type="float">
 <cfset var structResponse = {"msg":'Successfully Submitted',"status":true}>
 
     <cfif structKeyExists(url,"userId" )>
@@ -182,7 +187,8 @@
                 dt_task_due_date = <cfqueryparam value="#arguments.dt_task_due_date#" cfsqltype="cf_sql_date">,
                 is_recurring=<cfqueryparam value="#arguments.is_recurring#" cfsqltype="cf_sql_integer">,
                 recurrence_type=<cfqueryparam value="#arguments.recurrence_type#" cfsqltype="cf_sql_varchar">,
-                recurrence_end_date=<cfqueryparam value="#arguments.recurrence_end_date#" cfsqltype="cf_sql_date">
+                recurrence_end_date=<cfqueryparam value="#arguments.recurrence_end_date#" cfsqltype="cf_sql_date">,
+                estimate_hours=<cfqueryparam value="#arguments.estimate_hours#" cfsqltype="cf_sql_float">
                 
             WHERE int_task_id =#url.userId#
         </cfquery>  
@@ -191,7 +197,7 @@
     <cfelse>
     <cftry>
     <cfquery name="addTask" datasource="dsn_addressbook">
-        INSERT INTO tasks(int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,is_recurring,recurrence_type,recurrence_end_date,created_at)
+        INSERT INTO tasks(int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,is_recurring,recurrence_type,recurrence_end_date,estimate_hours,created_at)
         VALUES(
             <cfqueryparam value="#arguments.int_user_id#" cfsqltype="cf_sql_integer">,
             <cfqueryparam value="#arguments.str_task_name#" cfsqltype="cf_sql_varchar">,
@@ -202,13 +208,19 @@
              <cfqueryparam value="#arguments.is_recurring#" cfsqltype="cf_sql_integer">,
              <cfqueryparam value="#arguments.recurrence_type#" cfsqltype="cf_sql_varchar">,
              <cfqueryparam value="#arguments.recurrence_end_date#" cfsqltype="cf_sql_date">,
+             <cfqueryparam value="#arguments.estimate_hours#" cfsqltype="cf_sql_float">,
               <cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">
 
         )
     </cfquery>
-    
+       
         <cfcatch>
-        <p>error</p>
+        <cfoutput>
+            <p>Error occurred: #cfcatch.message#</p>
+            <p>Error Code: #cfcatch.errorCode#</p>
+            <p>Details: #cfcatch.detail#</p>
+            <p>Stack Trace: #cfcatch.stackTrace#</p>
+            </cfoutput>
         </cfcatch>
     </cftry>
 
@@ -224,7 +236,7 @@
 <cffunction  name="generateReccuringTask" access="public" returnType="void">
     <cfset datasource="dsn_addressbook">
     <cfquery name="qryReccuringTask" datasource="#datasource#">
-        select int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,recurrence_type,recurrence_end_date
+        select int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,recurrence_type,recurrence_end_date,estimate_hours
         from tasks
         where is_recurring=1 AND
         dt_task_due_date<=<cfqueryparam value="#Now()#" cfsqltype="cf_sql_date"> AND 
@@ -242,21 +254,7 @@
                 <cfset newDueDate=dateAdd("m",1 , dt_task_due_date)>
             </cfif>
       
-        <cfquery datasource="#datasource#">
-            insert into tasks(int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,is_recurring,recurrence_type,recurrence_end_date,created_at)
-            values(
-                <cfqueryparam value="#qryReccuringTask.int_user_id#" cfsqltype="cf_sql_integer">,
-                <cfqueryparam value="#qryReccuringTask.str_task_name#" cfsqltype="cf_sql_varchar">,
-                <cfqueryparam value="#qryReccuringTask.str_task_description#" cfsqltype="cf_sql_varchar">,
-                 <cfqueryparam value="#qryReccuringTask.int_task_priority#" cfsqltype="cf_sql_integer">,
-                 <cfqueryparam value="#newDueDate#" cfsqltype="cf_sql_date">,
-                 <cfqueryparam value="#qryReccuringTask.int_task_status#" cfsqltype="cf_sql_integer">,
-                  <cfqueryparam value="1" cfsqltype="cf_sql_integer">,
-                  <cfqueryparam value="#qryReccuringTask.recurrence_type#" cfsqltype="cf_sql_varchar">,
-                  <cfqueryparam value="#qryReccuringTask.recurrence_end_date#" cfsqltype="cf_sql_date">,
-                   <cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">
-            )
-        </cfquery>
+        
        
          </cfloop>
       
@@ -289,12 +287,6 @@
     </cfquery>
 </cffunction>
 
-
-
-
-
-
-
 <cfset checkPermissons()>
 <cfset generateReccuringTask()>
 <cfset setDefaultValues()>
@@ -309,8 +301,8 @@
             description=variables.str_task_description,
             priority=variables.int_task_priority,
             status = variables.int_task_status,
-            duedate=variables.dt_task_due_date
-         
+            duedate=variables.dt_task_due_date,
+            estimate_hours=variables.estimate_hours
             
     )>
     <cfif len(variables.error_msg) EQ 0>
@@ -324,7 +316,8 @@
             dt_task_due_date = variables.dt_task_due_date,
             is_recurring=variables.is_recurring,
             recurrence_type=variables.recurrence_type,
-            recurrence_end_date=variables.recurrence_end_date
+            recurrence_end_date=variables.recurrence_end_date,
+            estimate_hours=variables.estimate_hours
            )>
       
            <cfset loadTaskDetails()>

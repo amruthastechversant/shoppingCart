@@ -1,5 +1,5 @@
 
-<cfinclude  template="../taskmanagement/usertaskboardaction.cfm">
+<cfinclude  template="../taskmanagement/taskboardaction.cfm">
 <cfoutput>
 <!DOCTYPE html>
 <html lang="en">

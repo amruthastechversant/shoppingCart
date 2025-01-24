@@ -4,7 +4,6 @@ body{
     font-family: san-sarif;
     font-size: 18px;
     background-color:#dee6e3; 
-
 }
 
 input[type=submit]{
@@ -72,5 +71,4 @@ input[type=submit]{
 }
 .logintble{background-color:#c2e5d8;height:375px; border:0; padding:30px 20px;margin: 40px;background-image: url('img/3525926.jpg');}
 .logintblreg{background-color:#c2e5d8;height:500px; border:0; padding:30px 20px;   margin: 40px;background-image: url('img/3525926.jpg');}
-
-     
+        

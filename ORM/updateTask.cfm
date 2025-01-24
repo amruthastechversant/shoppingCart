@@ -1,6 +1,8 @@
 <!-- Handle completed tasks -->
 <cfif structKeyExists(form, "completedtasks")>
     <cfset completedTasks = form.completedtasks>
+
+
     <cfif isArray(completedTasks)>
         <cfloop array="#completedTasks#" index="int_task_id">
        

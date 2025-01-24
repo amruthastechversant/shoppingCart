@@ -17,6 +17,7 @@
     <cfquery name="qryResults" datasource="#datasource#">
         SELECT 
             c.int_task_id,
+            c.int_user_id,
             c.str_task_name, 
             c.str_task_description, 
             c.int_task_priority,
@@ -52,6 +53,26 @@
     <cfreturn qryResults>
 </cffunction>
 
+<cffunction  name="workinghours" returnType="query">
+
+        <cfargument  name="int_task_id" type="numeric">
+        <cfargument  name="int_user_id" type="numeric">
+        <cfargument  name="str_task_name" type="string">
+        <cfargument  name="int_task_status" type="string">
+        <cfargument  name="allotted_time" type="float">
+    <cfset var datasource="dsn_addressbook">
+    <cfquery name="workinghours" datasource="#datasource#">
+        insert into task_time(int_task_id,int_user_id,str_task_name,int_task_status,allotted_time)
+        values(
+                <cfqueryparam value="#arguments.int_task_id#" cfsqltype="cf_sql_integer">,
+                <cfqueryparam value="#arguments.int_user_id#" cfsqltype="cf_sql_integer">,
+                 <cfqueryparam value="#arguments.str_task_name#" cfsqltype="cf_sql_varchar">,
+                  <cfqueryparam value="#arguments.int_task_status#" cfsqltype="cf_sql_integer">,
+                  <cfqueryparam value="#arguments.allotted_time#" cfsqltype="cf_sql_float">
+        )
+    </cfquery>
+        <cfreturn workinghours>
+</cffunction>
 
 
 <cffunction name="getTodayTask" returnType="query">
@@ -94,6 +115,29 @@
         OFFSET <cfqueryparam value="#startRecord#" cfsqltype="cf_sql_integer">
     </cfquery>
     <cfreturn qryResults>
+</cffunction>
+
+
+<cffunction  name="pendingTask" access="public" returnType="query">
+        <cfset var qryResult="">
+        <cfset var datasource="dsn_addressbook">
+
+        <cfquery name="qryResult" datasource="#datasource#">
+                select int_task_id,int_user_id,str_task_name,str_task_description,int_task_priority,dt_task_due_date,int_task_status,created_at
+                from tasks
+                where int_task_status=1
+
+                <cfif structKeyExists(form, "str_keyword") AND len(form.str_keyword) GT 0>
+                    AND (
+                        str_task_name LIKE <cfqueryparam value="%#trim(form.str_keyword)#%" cfsqltype="cf_sql_varchar">
+                        OR str_task_description LIKE <cfqueryparam value="%#trim(form.str_keyword)#%" cfsqltype="cf_sql_varchar">
+                    )
+
+                    ORDER BY int_task_priority,dt_task_due_date
+
+                </cfif>
+        </cfquery>
+            <cfreturn qryResult> 
 </cffunction>
 
 
@@ -148,8 +192,31 @@
 </cfquery>
     <cfreturn qryPendingStatus>
 </cffunction>
+<cffunction name="getDueDateAlert" output="false" returnType="string">
+    <cfargument name="dueDate" type="date" required="true">
+
+    <!-- Normalize today and tomorrow to exclude time -->
+    <cfset var today = CreateDateTime(Year(Now()), Month(Now()), Day(Now()), 0, 0, 0)>
+    <cfset var tomorrow = DateAdd("d", 1, today)>
+    <cfset var alertMessage = "">
+
+    <!-- Normalize arguments.dueDate -->
+    <cfset var dueDateNormalized = CreateDateTime(Year(arguments.dueDate), Month(arguments.dueDate), Day(arguments.dueDate), 0, 0, 0)>
+
+    <!-- Compare normalized dates -->
+    <cfif DateCompare(dueDateNormalized, today) EQ 0>
+        <cfset alertMessage = "Task Due Date is today">
+    <cfelseif DateCompare(dueDateNormalized, tomorrow) EQ 0>
+        <cfset alertMessage = "Task Due Date is tomorrow">
+    </cfif>
+
+    <cfreturn alertMessage>
+</cffunction>
+
+
 
 <cfset setDefaultValues()>
 <cfset getResults()>
 <cfset tasks=getContacts()>
-<cfset TodaysTasks=getTodayTask()>
+
+
